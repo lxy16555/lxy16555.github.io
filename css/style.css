@@ -554,7 +554,7 @@ button {
 .article-content .highlight .gutter pre,
 .article-content .gist .gist-file .gist-data .line-numbers {
   color: #666;
-  font-size: 16px;
+  font-size: 1em;
 }
 .article-content pre,
 .article-content code {
