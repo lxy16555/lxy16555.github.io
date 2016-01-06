@@ -549,12 +549,12 @@ button {
   border-width: 0;
   overflow: auto;
   color: #4d4d4c;
-  line-height: 1em;
+  line-height: 1.6;
 }
 .article-content .highlight .gutter pre,
 .article-content .gist .gist-file .gist-data .line-numbers {
   color: #666;
-  font-size: 0.85em;
+  font-size: 16px;
 }
 .article-content pre,
 .article-content code {
