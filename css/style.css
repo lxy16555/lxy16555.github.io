@@ -542,14 +542,14 @@ button {
 .article-content pre,
 .article-content .highlight {
   background: #f7f7f7;
-  margin: 0;
-  padding: 20px 20px;
-  border-style: solid;
-  border-color: #e1e1e1;
-  border-width: 0;
-  overflow: auto;
+  margin: 0.5em 0;
+  padding: 0.5em 2%;
   color: #4d4d4c;
   line-height: 1.6;
+  font-size: 0.8em;
+  -webkit-border-radius: 0.35em;
+  border-radius: 0.35em;
+  word-wrap: break-word;
 }
 .article-content .highlight .gutter pre,
 .article-content .gist .gist-file .gist-data .line-numbers {
