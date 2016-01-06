@@ -563,7 +563,7 @@ button {
 }
 .article-content code {
   background: rgba(0,0,0,0.08);
-  padding: 0 0.3em;
+  padding: 20px 20px;
 }
 .article-content pre code {
   background: none;
