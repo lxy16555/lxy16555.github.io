@@ -563,7 +563,7 @@ button {
 }
 .article-content code {
   background: rgba(0,0,0,0.08);
-  padding: 20px 20px;
+  padding: 0 0.3em;
 }
 .article-content pre code {
   background: none;
@@ -587,7 +587,7 @@ button {
   zoom: 1;
   font-size: 0.85em;
   color: #8e908c;
-  line-height: 1em;
+  line-height: 1.6;
   margin-bottom: 1em;
 }
 .article-content .highlight figcaption:before,
