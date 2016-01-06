@@ -549,7 +549,7 @@ button {
   border-width: 0;
   overflow: auto;
   color: #4d4d4c;
-  line-height: 1.6;
+  line-height: 1em;
 }
 .article-content .highlight .gutter pre,
 .article-content .gist .gist-file .gist-data .line-numbers {
@@ -587,7 +587,7 @@ button {
   zoom: 1;
   font-size: 0.85em;
   color: #8e908c;
-  line-height: 1.6;
+  line-height: 1em;
   margin-bottom: 1em;
 }
 .article-content .highlight figcaption:before,
