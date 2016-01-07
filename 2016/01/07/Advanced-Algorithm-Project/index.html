@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    
+    <title>Advanced Algorithm Project | Xiangyu Liu&#39;s Blog</title>
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    
+    <link rel="stylesheet" href="/libs/fancybox/jquery.fancybox.css" charset="utf-8">
+    
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="site">
+    <header class="site-header">
+        <h1 class="site-title"><a href="/">Xiangyu Liu&#39;s Blog</a></h1>
+        <nav class="site-nav">
+            <ul class="nav">
+                
+                <li><a href="/">Home</a></li>
+                
+                <li><a href="/archives">Archives</a></li>
+                
+                <li><a href="/atom.xml">rss</a></li>
+                
+                
+                <li><a class="toggle-search" href="#search">search</a></li>
+            </ul>
+        </nav>
+        <div class="site-search" id="search">
+            <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+        
+            <div class="site-header-background" style="background-image:url(http://reumia.github.io/hexo-theme-zzoman2015/images/background-zzoman2015.jpg)"></div>
+        
+    </header>
+    <div class="site-body">
+        <div class="global-width">
+    <article class="article" data-layout="post" data-slug="Advanced-Algorithm-Project">
+        <div class="article-content">
+            
+            
+            <header class="article-header">
+                <div class="article-meta">
+                    
+                    
+                    
+                </div>
+                
+    <h1 class="article-title" itemprop="name">
+      <a href="/2016/01/07/Advanced-Algorithm-Project/">Advanced Algorithm Project</a>
+    </h1>
+
+            </header>
+            
+            <div class="article-body">
+                <h2 id="1-_INTRODUCTION"><a href="#1-_INTRODUCTION" class="headerlink" title="1. INTRODUCTION"></a>1. INTRODUCTION</h2><p>The minimum vertex cover problem belongs to the class NP-hard with numerous applications in computational biology; it is intractable to search for an optimal solution. We will implement three algorithms: branch and bound with heuristic approximation guarantee, hill climbing, and simulated annealing, in order to search for a near-optimizated solution by evaluating each algorithm theoretically and experimentally.<br>The branch and bound algorithm is designed using Depth First Search rather than Breadth First Search, and the heuristic approximation selected is a 2-approximation algorithm that chooses any remaining edges in the graph. Theoretically and experimentally, this has a high time-complexity but can obtain a global optimal solution given enough time. We will change the searching method from BFS to DFS for two reasons. One, it gives a considerable solution as well as an upper bound first. This helps to limit the size of the priority queue and get considerable solutions for execution. Second, this limits the increase in size of the priority queue to avoid stack overflow.<br>Hill climbing is a form of local search. We start by keeping all vertex in a large vertex cover, and continuously try to remove the vertex with the smallest degree until we are unable to maintain a vertex cover. The implementation involves an ordering of the vertex by degree in ascending order and trying to remove vertex with the lowest degree at each iteration. The algorithm performs well experimentally with just a slight percentage error from the optimal solution and an acceptable running time.<br>Simulated annealing is another form of local search. Similar to hill climbing, but it adds a mechanism that can jump out of local minimum by accepting a worse solution based on a probability. This makes it more likely to reach the global optimal solution. Overall  the algorithm performs efficiently with relatively low error.</p>
+<h2 id="2-_RELATED_WORK"><a href="#2-_RELATED_WORK" class="headerlink" title="2. RELATED WORK"></a>2. RELATED WORK</h2><p>There are numerous algorithms for solving the minimum vertex cover problem efficiently. The fastest solutions utilize the heuristic approximation algorithms; they can usually provide near-optimal solutions within polynomial time. Some local search algorithms like the genetic algorithm, hill climbing and simulated annealing can also obtain near-optimal solutions as compared to heuristic approximation guarantees. Meanwhile, a high complexity branch and bound algorithm can find the global optimal solution in exponential time.</p>
+<h2 id="3-_ALGORITHMS"><a href="#3-_ALGORITHMS" class="headerlink" title="3. ALGORITHMS"></a>3. ALGORITHMS</h2><h3 id="3-1_Branch_and_bound"><a href="#3-1_Branch_and_bound" class="headerlink" title="3.1 Branch and bound"></a>3.1 Branch and bound</h3><p>The branch and bound algorithm starts with an empty set of vertex, an initial upper bound equal to the number of vertex in the graph, and an empty priority queue to store any unsolved subproblems ordered by their lower bounds. For every branch, we choose the vertex with the highest degree in current graph and expand the problem into two new subproblems that collect either the vertex or all its neighbors into the vertex cover and update the graph respectively. Then we use a heuristic approximation algorithm to calculate the lower bound for each subproblem. If the lower bound does not exceed the upper bound, we put the subproblem with a larger lower bound into the priority queue. We then move on using the subproblem with a smaller lower bound, and repeat. If the solution is better than the upper bound, we update the upper bound and the current best vertex cover as the subproblem, else we just keep the current best vertex cover and upper bound. Then we pop the next subproblem in the priority queue and continue the process until the priority queue is empty or the next subproblem’s lower bound is larger than the upper bound (a new best). This means all remaining subproblems would give a solution larger than the current best solution, thus the current best solution is the global optimal solution.<br>Below is the pseudo-code for our branch and bound implementation:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Initialize PriorityQueue Q;</span><br><span class="line">Initialize Best;</span><br><span class="line">Put an empty element into Q;</span><br><span class="line"><span class="keyword">while</span> (!Q.isEmpty())  &#123;</span><br><span class="line">    curVC = Q.remove( );</span><br><span class="line">    dupG = duplicate the original graph G;</span><br><span class="line">    curG = cut the dupG based on curVC;</span><br><span class="line">    temp = DFS(curVC,curG);      </span><br><span class="line">    <span class="keyword">if</span> (temp &lt; Best)</span><br><span class="line">    	Best=temp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>And the DFS function is:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (!curG.adj.isEmpty()) &#123;  </span><br><span class="line">    nextV = nextV(curG);   </span><br><span class="line">    curVC2 = duplicate curVC;</span><br><span class="line">    add nextV into curVC;</span><br><span class="line">    add all its neighbors into curVC2;</span><br><span class="line">    LB1 = approx(nextV,curG);</span><br><span class="line">    LB2 = approx(neighbors of nextV,curG);</span><br><span class="line">    <span class="keyword">if</span> (both of them are smaller than Best)</span><br><span class="line">        put larger lowerbound into Q,<span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">if</span> (one of them is smaller than Best)</span><br><span class="line">        <span class="keyword">continue</span> that one;</span><br><span class="line">    <span class="keyword">if</span> (both of them are larger than Best)</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>In this algorithm, the calculation of lower bound uses the approximation guarantee and we would talk about it in next section. Also we implement some useful functions for getting a more precise solution. The pseudo-code are listed below.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">nextV</span><span class="params">(Graph G)</span> </span>&#123;</span><br><span class="line">    initialize nextV = <span class="number">0</span>;    </span><br><span class="line">    <span class="keyword">for</span> i = one vertex of G</span><br><span class="line">        <span class="keyword">if</span> i has more neighbors,update nextV;</span><br><span class="line">    <span class="keyword">return</span> nextV;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">Graph <span class="title">dupG</span><span class="params">(Graph G)</span> </span>&#123;</span><br><span class="line">Hashtable&lt;&gt;dupG=<span class="keyword">new</span> Hashtable&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> each edge in G</span><br><span class="line">        duplicate it into dupG;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Graph(dupG);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">Graph <span class="title">restG</span><span class="params">(List curVC,Graph G)</span> </span>&#123;</span><br><span class="line">    Set restV=G.vertex</span><br><span class="line">    restV.removeAll(curVC);</span><br><span class="line">    <span class="keyword">while</span>(restV is not empty) &#123;</span><br><span class="line">        remove vertex in G;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Theoretically, this algorithm has a high time and space complexity. Since we need to store all subproblems in a priority queue, the length of the queue can be,  in worst case, the number of vertex in graph where each element is a set of vertex (a list of chosen vertex numbers), consequently worsening the space complexity. Since the algorithm never stops before the queue is empty or the lower bound of next subproblem is larger than the current best solution, the time complexity for the loop – in the worst case – is equal to the max number of subproblems. Within each iteration, we provided some tools to find the vertex with the highest degree, duplicate the graph, cut the graph, and find the approximation guarantee. Since all these functions are in polynomial time, the total time complexity is polynomial as well.<br>The time and space complexity for this algorithm is theoretically high. Since we need to store all subproblems in priority queue, the length of the queue can be 2^n in worst case where n represents the number of vertex in graph while each elements in the queue is a set of vertex (a list of chosen vertex NO.), which would make the space complexity worse. While since the algorithm never stops before the queue is empty or the lower bound of next subproblem is larger than the best solution, the time complexity for the loop would be O(2^n) in worst case. And in each iteration, we provide some tools to find the vertex with the most degree, duplicate the graph, cut the graph and the approximation guarantee. Since all these functions are in polynomial time, the total time complexity would be O(2^n).<br>We see that the branch and bound algorithm can obtain the optimal solution given enough time. However it may waste resources if implemented without a timeout. We take the required amount of time into consideration and evolve the branch and bound algorithm so that it can provide the current best solution within an alloted amount of time.</p>
+<h3 id="3-2_Heuristics_with_approximation_guarantees"><a href="#3-2_Heuristics_with_approximation_guarantees" class="headerlink" title="3.2 Heuristics with approximation guarantees"></a>3.2 Heuristics with approximation guarantees</h3><p>The heuristic approximation guarantee is used for the branch and bound algorithm to calculate the lower bound of subproblems. We selected the 2-approximation algorithm introduced in the course. Below is the pseudo-code:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">approx(List curVC,Graph G) &#123;</span><br><span class="line">    Set restV=G.vertex;</span><br><span class="line">    restV.removeAll(curVC);</span><br><span class="line">    <span class="keyword">while</span>(!restV.isEmpty()) &#123;</span><br><span class="line">        get i from restV;</span><br><span class="line">        find i and one neighbor in G called j;</span><br><span class="line">        remove i,j and all neighbors in restV;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>The algorithm is used to search for a solution at most 2 times worse than the optimal solution for minimum vertex cover. It starts with an empty vertex cover and a graph for searching. It randomly select any remain edge in the graph and collects both vertex of that edge into the vertex cover. The algorithm would stop when there are no more edges in the graph. This solution is larger than or equal to the optimal solution, otherwise it would contradict the initial assumption that we already have the size of the optimal solution. And this solution must be less than or equal to twice the size of optimal solution since this ensures all edges are covered by a set of vertex by using the edges themselves; at worst we have a set with size double the set of edges. The correctness of this algorithm has been proved in lecture.<br>As described in the lecture, the 2-approximation algorithm guarantees that the approximation lies between the size of the optimal solution and twice the size of the optimal solution. OPT≤APX≤2OPT. Based on that, the lower bound can be half the approximation 1/2APX.<br>Since all it needs to do is remove edges in the graph, in worst case the time complexity is equal to the number of edges in the graph O(E). The space complexity depends on the user reqirement: if the user wants to get just the size of the vertex cover, it doesn’t require extra space. If the user wants the exact vertex cover, it requires O(V) in worst case.<br>This heuristic algorithm benefits from an apparant polynomial time and space complexity, but suffers from the unprecise solution.<br>With research we found many other heuristic approximation algorithm with more precise solutions described in various papers. But for this task, the approximation is used only for the calculation of the lower bound, so the algorithm with a definite, lower time complexity would be benefit, thus we chose this algorithm.</p>
+<h3 id="3-3_Hill_climbing"><a href="#3-3_Hill_climbing" class="headerlink" title="3.3 Hill climbing"></a>3.3 Hill climbing</h3><p>Starting from the whole set of vertex as the initial vertex cover, the only task of our hill climbing algorithm is to delete. Put simply, the algorithm keeps trying to delete one node from the current set each time, forming a new valid set whose size is one or more nodes smaller, until deletion of any node will result a an invalid vertex cover. The neighborhood in this case is defined as sets of nodes that are all one node smaller than the current.<br>The deletion order is based on a priority queue of node degree. The algorithm deletes the node with the smallest degree in the current solution (or more precisely, the priority queue), since it covers least number of edges. This approach can make the algorithm find a solution faster. If deletion of that node still results in a valid vertex cover, the algorithm will simply repeat. If the deletion is unsuccessful, meaning the remaining nodes can’t cover all edges, it indicates the node just picked is essential to the vertex cover. So, to always keep a valid vertex cover as the solution, the node must be added back to the solution, and the algorithm will continue to search and delete the next node with the smallest degree besides the one(s) just attempted.<br>If nodes have been examined and are deemed essential, they are also essential to smaller vertex covers found later, and needn’t be examined again. This is because if some edge(s) are only covered by one node in a partial solution, then in a smaller neighboring solution the edge(s) are still only covered by the same node. Deletion of this node will result in the uncovered edge(s). For this reason, each node in the graph only need to be examined once and subsequently removed from the priority queue, whether it was deleted or not.<br>Another case to consider is when several nodes have the same degree: the algorithm will take all nodes with the same degree and random choose an order to examine them in. This prevents the algorithm from getting stuck in the same local minima.<br>The algorithm ends when deletion of any node will result in an invalid vertex cover. In other words, it will end when the priority queue is empty. This will guarantee a local optimal solution because if there is smaller neighboring solution, the algorithm will find and reach it via deleting node(s), obtaining a smaller vertex cover.<br><img src="/img/hc.PNG" alt=" "><br>Since the processing order of this algorithm is dependent on the degree of nodes, it is a relatively fixed one. The random step occurs when there are several nodes with same degree, making it easy to get stuck in some local minima, though it can obtain a local optimal solution faster than other algorithms.<br>Another similar approach is to select nodes randomly instead of choosing the node with the smallest degree. The running time remains the same, but percentage error is relatively large, thus this approach is discarded.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">G ¬ graph;</span><br><span class="line">vc ¬ the whole vertex;</span><br><span class="line">pq ¬ the whole vertex with least degree priority;</span><br><span class="line"><span class="keyword">while</span> (pq.size != <span class="number">0</span> &amp;&amp; time &lt; cutoff time)</span><br><span class="line">    list ¬ node with the same least degree removed from pq;</span><br><span class="line">    <span class="keyword">while</span> (list.size() != <span class="number">0</span>)</span><br><span class="line">        nd ¬ pick and delete random one element in list;</span><br><span class="line">    delete nd from vc;</span><br><span class="line">    <span class="keyword">if</span> (checkValidVertecCover(vc))</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        add nd back to vc;</span><br><span class="line">    endif</span><br><span class="line">        endwhile</span><br><span class="line">endwhile</span><br><span class="line"><span class="keyword">return</span> vc;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-4_Simulated_annealing"><a href="#3-4_Simulated_annealing" class="headerlink" title="3.4 Simulated annealing"></a>3.4 Simulated annealing</h3><p>The Hill Climbing deletes vertex in every iteration. So there is possible that one vertex in optimal solution is deleted in the early stage and then it’s stuck in local minimum. In order to fix this problem, Simulated Annealing is able to add back vertex back into the vertex cover based on a probability. The algorithm works as followed.<br>The initial vertex cover is all nodes.<br>Set an initial temperature and an end temperature. In every iteration, decrease the temperature by a small ratio.<br>In every iteration, randomly choose a vertex from original graph, There are two cases. First, if this vertex is already in vertex cover, delete it and check if the vertex cover is valid. If it’s still valid, which means deleting the vertex gets a smaller size vertex cover, so the algorithm accepts the new better vertex cover. if it’s not valid, add this node back to vertex cover to keep the vertex cover valid all the time. Second case is, if the randomly selected vertex is not in vertex cover, then add it to vertex cover. The vertex cover is still valid but it’s one more vertex larger, which means it’s a worse solution. However, maybe this vertex is just the vertex that may cause the Hill Climbing stuck into the local minimum. Therefore, the algorithm tries to accept this worse solution based on a probability p. We define p as p = exp( - ( 1 + deg(v) ) / temperature). Using this definition p is in range of 0 to 1 so we compare p to a random value between 0 to 1. If p is larger than this random value, accept the worse solution. If not, roll back.<br>The reason simulated annealing uses a probability is that it’s a good criteria. At early stage, almost all the vertices are in vertex cover, and the randomly selection process is very likely to pick and delete a vertex which is in optimal solution. Under such circumstances, the probability p is relatively close to 1 at early stage, which means it’s very likely to add back a vertex into vertex cover. Since temperature is decreasing in every iteration, the probability is also decreasing, the chance of adding back a vertex is decreasing.<br>The simulated annealing algorithm still is not guaranteed to return the optimal solution. But by setting a probability to add back vertex, it’s able to jump out of the local minimum and get close to the optimal solution.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">G ¬ graph;</span><br><span class="line">vc ¬ the whole vertex;</span><br><span class="line">E ¬ end temperature;</span><br><span class="line">alpha ¬ temperature decrease ratio;</span><br><span class="line"><span class="keyword">while</span> (temperature&gt;E)</span><br><span class="line">    v ¬ radomly select one vertex;</span><br><span class="line">    <span class="keyword">while</span> (v in vc )</span><br><span class="line">        <span class="function">delete v from vc</span><br><span class="line">        <span class="title">if</span> <span class="params">(!checkValidVertecCover(vc)</span>)</span><br><span class="line">            add v back to vc</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            add v into vc</span><br><span class="line">        endif</span><br><span class="line">        p = exp( - ( <span class="number">1</span> + deg(v) ) / temperature)</span><br><span class="line">        <span class="keyword">if</span> (p&lt; RandomValueBetween01)</span><br><span class="line">            delete v from vc;</span><br><span class="line">        endif	</span><br><span class="line">    endwhile</span><br><span class="line">endwhile</span><br><span class="line"><span class="keyword">return</span> vc;</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-_EMPIRICAL_EVALUATION"><a href="#4-_EMPIRICAL_EVALUATION" class="headerlink" title="4. EMPIRICAL EVALUATION"></a>4. EMPIRICAL EVALUATION</h2><h3 id="4-1_Platform"><a href="#4-1_Platform" class="headerlink" title="4.1 Platform"></a>4.1 Platform</h3><p>Testing machine runs Windows 10 with a CPU Intel(R) Core™ i7-4710HQ CPU @ 2.50GHz, 8.00 GB RAM. The programming language we choose is Java with Java JDK 1.8.0.65 and the compiler to be JRE 1.8.</p>
+<h3 id="4-2_Evaluation_criteria"><a href="#4-2_Evaluation_criteria" class="headerlink" title="4.2 Evaluation criteria"></a>4.2 Evaluation criteria</h3><p>4.2.1 Running Time<br>In this paper, our implementations includes a timeout that we based on theoretical runtimes and narrowed the range with experimental runtimes. As a compartor between algorithms, runtimes tells us about the algorithm’s efficiency, as well as provide a ruler for mearsuring the effects of various factors on efficiency, such as the size of the set of vertex or edge.<br>4.2.2 Relative Error<br>Besides running time, the accuracy of the algorithm greatly affects its usage and implementation. Multiples times we have iterated through an algorithm implementation due to the tradeoff between running time and accuracy. Relative error gives us another criteria to judge the algorithm implementation, such as checking whether or not increasing sample sizes affects accuracy. However, this measurement must be taken with a grain of salt, as local search algorithms often afford an element of randomness, thus we must be careful and take the average of numerous runs when recording data.</p>
+<h3 id="4-3_Obtained_results"><a href="#4-3_Obtained_results" class="headerlink" title="4.3 Obtained results"></a>4.3 Obtained results</h3><p>4.3.1 Comprehensive table<br>Table below shows the comprehensive information for the three algorithms respectively. The running time is in unit s, VC is the minimum vertex cover solution generated by algorithms within the running time, and the RelErr is the relative error which is calculated by the equation (SOLUTION-OPT)/OPT.<br><img src="/img/algorithm.PNG" alt=" "><br>4.3.2 Approximation lower bound<br>The next table shows the  relation of the lowest lower bound generated by the heuristic approximation guarantee comparing with the solution of the branch and bound algorithm and the optimal one. The data in the table shows that for the lower bound task, the approximation algorithm do not need to give a better solution, since it always lower than the optimal solution. Meanwhile, the running time of the approximation algorithm do affect the time complexity of the branch and bound algorithm. So, instead of a precise algorithm, the approximation should choose a fastest one for a better performance of Branch and Bound.<br><img src="/img/algorithm2.PNG" alt=" "><br>4.3.3 QRTD<br><img src="/img/qrtdhc1.PNG" alt=" "> <img src="/img/qrtdhc2.PNG" alt=" "><br>With time increasing, there is a greater probability of reaching specific solution quality. Higher solution qualities require more time. For power graph, there is a boost around 1.1 seconds, indicating most runs obtained a fine solution at this point, though 3% quality is hard to reach for hill climbing algorithm. For star2, the boost is not so obvious compared to the previous one, and 6% quality is rarely reached.<br><img src="/img/qrtdsa1.PNG" alt=" "><br><img src="/img/qrtdsa2.PNG" alt=" "><br>4.3.4 SQD<br><img src="/img/sqdhc1.PNG" alt=" "><br><img src="/img/sqdhc2.PNG" alt=" "><br>With less low quality requirement, the running time for hill climbing will decrease. And when quality requirement is the same, longer time will lead to a higher successful probability.<br><img src="/img/sqdsa1.PNG" alt=" "><br><img src="/img/sqdsa2.PNG" alt=" "><br>4.3.5 BoxPlots<br><img src="/img/bxhc1.PNG" alt=" "><br><img src="/img/bxhc2.PNG" alt=" "><br>The decreasing tendency indicates that, with lower quality requirement, the average running time required will be smaller, though some variance may occur. And due to large size of star2, and more nodes with same degree, the random range is greater than that of power, resulting in a larger variance in star2 figure.<br><img src="/img/bxsa1.PNG" alt=" "><br><img src="/img/bxsa2.PNG" alt=" "></p>
+<h2 id="5-_DISCUSSION"><a href="#5-_DISCUSSION" class="headerlink" title="5. DISCUSSION"></a>5. DISCUSSION</h2><h3 id="5-1_Branch_and_bound"><a href="#5-1_Branch_and_bound" class="headerlink" title="5.1 Branch and bound"></a>5.1 Branch and bound</h3><p>The branch and bound algorithm performs well in the test for all samples graphs. Although running time grows exponentially with the increase of graph size (both number of vertex and edges), this algorithm can still give a near-optimal or optimal solution for the Minimum Vertex Cover problem. Furthermore, because of the strategy we chose where every branch either chooses the vertex with most degree or all its neighbors, the near-optimal or optimal solution can be generated quickly (i.e. from the comprehensive table, a considerable solution can be generated within 1 minute for the sample graph with the highest number of edges). The relative error for these graphs lies in a range of 0.00% to 5.84%. The proportional element corresponding to the running time is the number of edges rather than the number of vertex.<br>The approximation algorithm is used to calculate the lower bound and the solution generated by the approximation algorithm is less than twice the size of the true optimal solution. The lower bound is at least half the size of the true optimal solution and the optimal lower bound should be exactly half the size of the current best solution from the branch and bound algorithm.</p>
+<h3 id="5-2_Hill_climbing"><a href="#5-2_Hill_climbing" class="headerlink" title="5.2 Hill climbing"></a>5.2 Hill climbing</h3><p>The hill climbing algorithm also performs well for all test samples, with the largest test graph solved in less than one minute. Errors are relatively controlled, with less than 7% for all test graphs and a few that can reach 0% error. This algorithm is an efficient way to find the minimum vertex cover, when accuracy is not strictly required to lie within a percentage.</p>
+<h3 id="5-3_Simulated_annealing"><a href="#5-3_Simulated_annealing" class="headerlink" title="5.3 Simulated annealing"></a>5.3 Simulated annealing</h3><p>The simulated annealing algorithm returns relatively accurate results. By occasionally accepting a worse solution, it runs for a longer time than hill climbing. In exchange, it can escape from local minimas and make another attempt at finding the global minima. However, this random element also deeply affects the data we gathered. Ranging from 0% to 7% in no particular trend, we found no relationship between relative error and input data size.</p>
+<hr>
+
+            </div>
+        </div>
+    </article>
+
+    
+    
+<nav class="article-nav">
+  
+  
+    <a href="/2016/01/07/Simulation-of-Parallel-TCP/" id="article-nav-older" class="article-nav-link-wrap next">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Simulation of Parallel TCP</div>
+    </a>
+  
+</nav>
+
+    
+
+    
+</div>
+    </div>
+    <footer class="site-footer">
+        <div class="global-width">
+            <ul class="site-widget">
+                
+                <li class="widget widget-links">
+                    <div class="linkslist">
+  <p class="asidetitle">links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://www.facebook.com/profile.php?id=100007028386722" target="_blank" title="Facebook">Facebook</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="https://www.linkedin.com/in/xiangyu-liu-04707598" target="_blank" title="LinkedIn">LinkedIn</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="https://github.com/lxy16555" target="_blank" title="Github">Github</a>
+            
+          </li>
+        
+    </ul>
+</div>
+                </li>
+                
+                <li class="widget widget-tag">
+                    
+                </li>
+                
+                <li class="widget widget-category">
+                    
+                </li>
+                
+                <li class="widget widget-recent_posts">
+                    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-body">
+      <ul>
+        
+          <li>
+            <a href="/2016/01/07/Advanced-Algorithm-Project/">Advanced Algorithm Project</a>
+          </li>
+        
+          <li>
+            <a href="/2016/01/07/Simulation-of-Parallel-TCP/">Simulation of Parallel TCP</a>
+          </li>
+        
+          <li>
+            <a href="/2016/01/06/Traffic-Modeling-Simulation/">Traffic Modeling &amp; Simulation</a>
+          </li>
+        
+          <li>
+            <a href="/2016/01/06/Yelp-Refiner/">Yelp Refiner</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+                </li>
+                
+            </ul>
+        </div>
+        <div class="site-info">
+            <address>
+                &copy; 2015 <a href="http://yoursite.com">Xiangyu Liu&#39;s Blog</a> All Right Reserved. <br/>
+                Powered by <a href="http://hexo.io">Hexo</a>. Theme by <a href="http://hexo.io/themes/">Hexo Themes</a>
+            </address>
+        </div>
+    </footer>
+    
+    <script src="/libs/jquery-1.11.3.min.js" type="text/javascript"></script>
+    
+    <script src="/libs/fancybox/jquery.fancybox.js" type="text/javascript"></script>
+    
+    <script src="/js/site_init.js" type="text/javascript"></script>
+    
+</body>
+</html>
