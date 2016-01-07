@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    
+    <title>Simulation of Parallel TCP | Xiangyu Liu&#39;s Blog</title>
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    
+    <link rel="stylesheet" href="/libs/fancybox/jquery.fancybox.css" charset="utf-8">
+    
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="site">
+    <header class="site-header">
+        <h1 class="site-title"><a href="/">Xiangyu Liu&#39;s Blog</a></h1>
+        <nav class="site-nav">
+            <ul class="nav">
+                
+                <li><a href="/">Home</a></li>
+                
+                <li><a href="/archives">Archives</a></li>
+                
+                <li><a href="/atom.xml">rss</a></li>
+                
+                
+                <li><a class="toggle-search" href="#search">search</a></li>
+            </ul>
+        </nav>
+        <div class="site-search" id="search">
+            <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+        
+            <div class="site-header-background" style="background-image:url(http://reumia.github.io/hexo-theme-zzoman2015/images/background-zzoman2015.jpg)"></div>
+        
+    </header>
+    <div class="site-body">
+        <div class="global-width">
+    <article class="article" data-layout="post" data-slug="Simulation-of-Parallel-TCP">
+        <div class="article-content">
+            
+            
+            <header class="article-header">
+                <div class="article-meta">
+                    
+                    
+                    
+                </div>
+                
+    <h1 class="article-title" itemprop="name">
+      <a href="/2016/01/06/Simulation-of-Parallel-TCP/">Simulation of Parallel TCP</a>
+    </h1>
+
+            </header>
+            
+            <div class="article-body">
+                <h2 id="1-_Introduction"><a href="#1-_Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>Now, the Internet has more and more high-bandwidth links and cinreasing number of network access technologies. The performance of applications using TCP is significantly lower than the bandwidth available on the network. One reason of poor TCP throughput is high packet loss rate. Packet loss, which indicates network congestion between a sender and receiver, is a broadly problem. When a shared public network becomes congested, packets will be dropped by routers and switches because of queue overflows. This problem determines that parallel TCP connections could be useful more broadly.<br><img src="/img/paratcp.PNG" alt=" "><br>Parallel TCP is a TCP enhancement which divides a standard TCP connection into a number of parallel connections. Parallel TCP defeats TCP’s congestion control mechanisms, leading to unfairness and congestion collapse. Parallel TCP flows are robust when systemic and random losses are present. The study showed that the observed loss process limits a single stream to just over 25% of a 100Mb/s link. However, six streams in parallel could obtain more than 80% utilization. Thus, random packet loss could degrade TCP performance, but the parallel TCP has been turn to be significantly better than the single one.<br>Parallel TCP has many advantages over TCP:</p>
+<ol>
+<li>Faster slow-start</li>
+<li>Can work around OS limitations on max TCP buffer sizes</li>
+<li>Faster recovery</li>
+<li>K-control loops instead of one</li>
+<li>May avoid slow-start burst losses of single giant flow<br>On the other hand, parallel TCP has some disadvantages as well:</li>
+<li>Requires changes to the application to support parallel streams</li>
+<li>If loss is due to congestion, the performance may be worse</li>
+<li>may add to congestion</li>
+<li>It is hard to select the buffer size and number of streams</li>
+<li>May lead to unfairness to other flows<br>There are some factors that affect aggregate throughput for parallel TCP streams hosts. When an application uses multiple TCP streams between two hosts, the aggregate bandwidth of all s TCP connections can be derived from Mathis equation:<br><img src="/img/e1.PNG" alt=" "><br>Where MSS is determined on a system wide level by a combination of network architecture and MTU discovery, we could assume that each MSSi is constant for all simultaneous TCP connections. And RTT could be assumed to the same for all TCP connections as well, considering that the entire network path traversed by packets for each TCP connection will likes take the same network path and under the same queuing delays. Thus, the Mathis equation could be rewritten in this way:<br><img src="/img/e2.PNG" alt=" "><br>The packet loss rate pi determines the maximum throughput of each stream. It is an important factor in the aggregate throughput of a parallel TCP connection. Each packet loss factor pi should not be affected as long as few packets are queued in routers or switches at each hop between the sender and receiver. This is true until the traffic reaches its capacity. From the equation, the application with s multiple TCP connections should create a large “virtual MSS” on the aggregate connection, which is s times of a single connection. Then, the parallel flow could put more packets during the congestion avoidance algorithm, because a single loss event only causes one of streams to decrease its window size.<br>We address this topic in our project to implement the parallel TCP in Java and make the transportation over it. In order to have a deep understanding of TCP first, we implement the TCP/UDP, and finish the tests to compare them in speed and reliability. Then based on regular TCP, we further design and add new mechanism to the protocol, and come up the Parallel TCP. With the new protocol, we transport files over local server, and compare the results from local area network. Related work and our experiments are introduced in the following sections. </li>
+</ol>
+<h2 id="2-_Methodology_for_Parallel_TCP"><a href="#2-_Methodology_for_Parallel_TCP" class="headerlink" title="2. Methodology for Parallel TCP"></a>2. Methodology for Parallel TCP</h2><p>Our goal is to build a parallel TCP to realize fast transportation. First, we have a target file which is about to sent from server to client. For single TCP, we have no necessity to do any pre-processing since it only have one transportation route. Now in parallel TCP, we have to split this find into several sub parts. Typically, there are two ways to split file. The first is to split the file into several big chunks, with the exact number of TCP sub paths. When transporting data, each chunk will be split into packets for further allocation. The system will assign the packets to each corresponding TCP route. When one TCP finishes the current transportation, allocate another packet to it. The other splitting criteria is to directly cut the file into multiple small packets.The number of packets is several times larger that the number of TCP subflows. The system just sequentially sends each file to each TCP route. In this project, we implement the first strategy to realize file splitting.<br>In this project, we not only aim at using several TCP paths to transport data from server to client, but also tend to change the number of sub-paths and measure the performance via calculating the throughput. Therefore, we increase the number of subflows from 1 to 10. Then we calculate how much time is taken for transporting a file.<br>For single TCP, we measure its throughput by:<br><img src="/img/e3.PNG" alt=" "><br>For parallel TCP throughput model, we measure the total bandwidth by:<br><img src="/img/e4.PNG" alt=" "></p>
+<h2 id="3-_Implementation"><a href="#3-_Implementation" class="headerlink" title="3. Implementation"></a>3. Implementation</h2><h3 id="3-1_Implement_TCP/UDP_Protocol"><a href="#3-1_Implement_TCP/UDP_Protocol" class="headerlink" title="3.1 Implement TCP/UDP Protocol"></a>3.1 Implement TCP/UDP Protocol</h3><p>The stack structure of TCP/UDP is shown in the figures below. We can tell from them that UDP lacks of packet sequence number and the ACK from receiving host. It means the UDP usually uses less RAM space and is faster than TCP. On the other head, UDP can’t deal with the loss packet problem and also have no congestion control so that the accuracy of transportation relies on the scale of file we transported. Basically, UDP doesn’t connect the receiver and sender before transportation, which is different from the TCP three-way handshake.<br>That is, UDP is a fast, comfortable, non-connection and unreliable form of data transportation.<br><img src="/img/UDP.PNG" alt=" "><br><img src="/img/TCP.PNG" alt=" "><br>To implement the project, we search for the original code for these different protocols and try them respectively on video file transportation. The video we selected to transport is around 2 GB which is large enough to compare the transportation time over different protocols. To test the original code with certain video file, first is to create a receiver with specific IP address and port for the sender to transport to.<br>The protocol can be defined either “udp” or “tcp” as which your protocol you choose. The port number is set for the sender to listen to. After open then receiving host, we can transport the video file from a sender.<br>Same with receiving host, the protocol and port parameter in sender defines type of protocol you choose and the listening port from receiver. Meanwhile, the host is the ip address of the file sender (will be 127.0.0.1 if test on the same computer). And the filename is the certain file for test.</p>
+<h3 id="3-2_Image_Transportation"><a href="#3-2_Image_Transportation" class="headerlink" title="3.2 Image Transportation"></a>3.2 Image Transportation</h3><p>First we test the two protocols on a jpg file, the size is 364KB. When doing tcp, we can receive an exact image file with the similar size.<br>While doing udp, the transportation will stop the first time the receiving host loss a packet and meets flow streaming congestion as the figure below indicates. In a certain test, the receiver exactly receives almost all the packet but not stop since meeting a deadlock. However, in most case, the transportation will congest at one point and begin the dead loop.<br>To compare the performance, we can compare two images directly. We can tell that the transportation through tcp receive and revert to the original image perfectly while the udp one, because of the non-sequence and no congestion control, shows a bad one.<br><img src="/img/tcppic.PNG" alt=" "><br><img src="/img/udppic.PNG" alt=" "></p>
+<h3 id="3-3_Implementation_of_Parallel_TCP_Transportation"><a href="#3-3_Implementation_of_Parallel_TCP_Transportation" class="headerlink" title="3.3 Implementation of Parallel TCP Transportation"></a>3.3 Implementation of Parallel TCP Transportation</h3><p>With the implemented TCP/UDP, we compare the performance of the parallel TCP with regular TCP. Specifically, we designed a multi-threads program with each thread performs as a single port of the parallel TCP. The strategy is that, to speed up the transportation between server and client, one can use parallel TCP over regular TCP because parallel TCP can make full use of the bandwidth, slow-start faster and recover faster.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span></span><br><span class="line">    &#123;theAddress = InetAddress.getByName(args[<span class="number">1</span>]);&#125;</span><br><span class="line"><span class="keyword">catch</span>(UnknownHostException e)</span><br><span class="line">    &#123;printError(<span class="string">"The specified host could not be found on the network"</span>);&#125;</span><br><span class="line"></span><br><span class="line">   theFile = <span class="keyword">new</span> File(args[<span class="number">2</span>]);</span><br><span class="line"><span class="keyword">if</span>(!theFile.canRead()) printError(<span class="string">"There was an error opening the specified file"</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// Create the sender object</span></span><br><span class="line"><span class="keyword">long</span> length = theFile.length();</span><br><span class="line"><span class="keyword">long</span> currentSize = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">long</span> packet = length / <span class="number">8192</span>;</span><br><span class="line"><span class="keyword">if</span> (length%<span class="number">8192</span> != <span class="number">0</span>)</span><br><span class="line">	packet++;</span><br><span class="line"><span class="keyword">long</span> packetPerTCP = packet / portNumber;</span><br><span class="line"><span class="keyword">if</span> (packet%portNumber != <span class="number">0</span>)</span><br><span class="line">	packetPerTCP++;</span><br><span class="line"><span class="keyword">long</span> piecesSize = packetPerTCP * <span class="number">8192</span>;</span><br><span class="line"><span class="keyword">long</span> Pointer = <span class="number">0L</span>;</span><br><span class="line"></span><br><span class="line">TCPSender sh = <span class="keyword">new</span> TCPSender(theAddress, <span class="number">8080</span>, theFile, <span class="number">0L</span>, <span class="number">0L</span>);</span><br><span class="line">sh.shakehand();</span><br><span class="line"></span><br><span class="line">Thread t = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;portNumber; i++) &#123;</span><br><span class="line">	<span class="keyword">if</span> (i == portNumber-<span class="number">1</span>)</span><br><span class="line">		t = <span class="keyword">new</span> Thread(<span class="keyword">new</span> TCPSender(theAddress, thePorts[i], theFile, Pointer, length-Pointer));</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		t = <span class="keyword">new</span> Thread(<span class="keyword">new</span> TCPSender(theAddress, thePorts[i], theFile, Pointer, piecesSize));</span><br><span class="line">	Pointer += piecesSize;</span><br><span class="line">	</span><br><span class="line">	t.start();</span><br></pre></td></tr></table></figure></p>
+<p>To implement the parallel TCP, we use the multi-thread programming to open parallel ports for the same IP. The code above shows to open the multi-thread in server.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;portNumber; i++) &#123;</span><br><span class="line">	thePorts[i] = <span class="number">8081</span>+i;</span><br><span class="line">	buffer.add(ByteBuffer.allocate((<span class="keyword">int</span>)(filesize/portNumber+<span class="number">8192</span>)));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Thread t = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;portNumber; i++) &#123;</span><br><span class="line">	t = <span class="keyword">new</span> Thread(<span class="keyword">new</span> TCPReceiver(thePorts[i], buffer.get(i)));</span><br><span class="line">	t.start();</span><br><span class="line">	ls.add(t);</span><br><span class="line">	start = System.nanoTime();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;  </span><br><span class="line">       <span class="keyword">for</span>(Thread thread : ls) </span><br><span class="line">           thread.join(); </span><br><span class="line">   &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;  </span><br><span class="line">       e.printStackTrace();  </span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">FileOutputStream out = <span class="keyword">new</span> FileOutputStream(filename);</span><br><span class="line"><span class="keyword">byte</span>[] bt = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">8192</span>];</span><br><span class="line"><span class="keyword">for</span> (ByteBuffer b : buffer) &#123;</span><br><span class="line">	b.flip();</span><br><span class="line">	<span class="keyword">while</span> (b.position()&lt;b.limit()) &#123;</span><br><span class="line">		b.get(bt, <span class="number">0</span>, (b.limit()-b.position()) &lt; bt.length ? (b.limit()-b.position()) : bt.length);</span><br><span class="line">		out.write(bt);</span><br><span class="line">	&#125;</span><br><span class="line">	System.out.println(<span class="string">"Thread done!"</span>);</span><br><span class="line">&#125;</span><br><span class="line">out.close();</span><br><span class="line"><span class="keyword">long</span> end = System.nanoTime();</span><br><span class="line">System.out.println((<span class="keyword">double</span>)(start-end)/(<span class="keyword">long</span>)<span class="number">1000000000</span>);</span><br></pre></td></tr></table></figure></p>
+<p>The code above shows the client receiving files from different ports and reconstruct it from buffer to disk. And for the opening of exact ports we chosen, first is to send the file information including file name and file size through the first TCP transportation. Then we cut the original file into pieces and each piece be transported through one port with a token to record its indices with which the client can rearrange the packets in buffer to guarantee the reception of file without error.<br>There are many different ways to arrange the transportation such as arrangement of packets one by one or send the file block by block through certain parallel TCP. The performance of the different arrangement could be different slightly, because the rearrangement for clients would be much easier with the block by block strategy over packet by packet. On the other hand, the first strategy will save some time for the cut of blocks.<br>In the experiment, we choose the second dividing strategy for its easy implementation and we test the performance of the same file transportation between different ports in local server and the transportation of file in local area network.<br><img src="/img/para1.PNG" alt=" "><br>The graph shows the performance for different number of ports we selected. It shows the transportation time of a 55 MB file over number of parallel TCP on local server. the throughput changes rapidly when the port number increases at first. And after the ports increases to 6 and 7, the transportation time becomes stable with going a little higher which is because of more congestions in parallel TCPs.<br><img src="/img/para2.PNG" alt=" "><br>The above graph shows the transportation through local area network. The improvement of multi-thread is smaller while stable comparing with transportation on the local server. This is mainly because the network flow is restricted by the bandwidth while the transportation in local server benefits from the faster reading and writing from the disk. Another difference is founded when number of ports increases to 6. There is a bad record there showing an anti-trend of change on throughput. This happens randomly when the transportation meets more congestion in local network. Due to a worse fast recovery mechanism over single TCP, the parallel TCP need more time to deal with a resend of lost packet.</p>
+<h2 id="5-_Conclusion"><a href="#5-_Conclusion" class="headerlink" title="5. Conclusion"></a>5. Conclusion</h2><p>In the project, we learn the parallel TCP from literature and implement one by ourselves. From the results, we can find that the parallel TCP improves the throughput and transport files faster than the regular TCP. It can make full use of the bandwidth to transport messages even there is packets loss. If one thread experiences the packet loss, the others will still work efficiently. Although the speed is improved, the change is not significant, because the parallel TCP implemented by ourselves is not perfect. It is actually simplified for the project. If we have a parallel TCP with complete congestion control and recovery mechanism. Parallel TCP is expected to have better performance.</p>
+<hr>
+
+            </div>
+        </div>
+    </article>
+
+    
+    
+<nav class="article-nav">
+  
+  
+    <a href="/2016/01/06/Traffic-Modeling-Simulation/" id="article-nav-older" class="article-nav-link-wrap next">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Traffic Modeling &amp; Simulation</div>
+    </a>
+  
+</nav>
+
+    
+
+    
+</div>
+    </div>
+    <footer class="site-footer">
+        <div class="global-width">
+            <ul class="site-widget">
+                
+                <li class="widget widget-links">
+                    <div class="linkslist">
+  <p class="asidetitle">links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://www.facebook.com/profile.php?id=100007028386722" target="_blank" title="Facebook">Facebook</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="https://www.linkedin.com/in/xiangyu-liu-04707598" target="_blank" title="LinkedIn">LinkedIn</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="https://github.com/lxy16555" target="_blank" title="Github">Github</a>
+            
+          </li>
+        
+    </ul>
+</div>
+                </li>
+                
+                <li class="widget widget-tag">
+                    
+                </li>
+                
+                <li class="widget widget-category">
+                    
+                </li>
+                
+                <li class="widget widget-recent_posts">
+                    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-body">
+      <ul>
+        
+          <li>
+            <a href="/2016/01/06/Simulation-of-Parallel-TCP/">Simulation of Parallel TCP</a>
+          </li>
+        
+          <li>
+            <a href="/2016/01/06/Traffic-Modeling-Simulation/">Traffic Modeling &amp; Simulation</a>
+          </li>
+        
+          <li>
+            <a href="/2016/01/06/Yelp-Refiner/">Yelp Refiner</a>
+          </li>
+        
+          <li>
+            <a href="/2016/01/06/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+                </li>
+                
+            </ul>
+        </div>
+        <div class="site-info">
+            <address>
+                &copy; 2015 <a href="http://yoursite.com">Xiangyu Liu&#39;s Blog</a> All Right Reserved. <br/>
+                Powered by <a href="http://hexo.io">Hexo</a>. Theme by <a href="http://hexo.io/themes/">Hexo Themes</a>
+            </address>
+        </div>
+    </footer>
+    
+    <script src="/libs/jquery-1.11.3.min.js" type="text/javascript"></script>
+    
+    <script src="/libs/fancybox/jquery.fancybox.js" type="text/javascript"></script>
+    
+    <script src="/js/site_init.js" type="text/javascript"></script>
+    
+</body>
+</html>
