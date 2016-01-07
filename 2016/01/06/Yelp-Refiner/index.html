@@ -47,7 +47,7 @@
 <div class="article-gallery">
   <div class="article-gallery-photos">
     
-      <a class="article-gallery-img img-wrap" href="/img/yelprefiner.PNG" rel="gallery_cij3oce7e00004wht8ldp36c8" style="background-image:url(/img/yelprefiner.PNG)"></a>
+      <a class="article-gallery-img img-wrap" href="/img/yelprefiner.PNG" rel="gallery_cij3oge8j0000xghtxctqyb2v" style="background-image:url(/img/yelprefiner.PNG)"></a>
     
   </div>
 </div>
@@ -56,7 +56,7 @@
             <header class="article-header">
                 <div class="article-meta">
                     <a href="/2016/01/06/Yelp-Refiner/" class="article-date">
-  <time datetime="2016-01-07T02:43:38.009Z">2016-01-06</time>
+  <time datetime="2016-01-07T03:10:17.944Z">2016-01-06</time>
 </a>
                     
                     
@@ -69,8 +69,7 @@
             </header>
             
             <div class="article-body">
-                <p><img src="/img/yelprefiner.PNG" alt=" "></p>
-<h2 id="1-_INTRODUCTION"><a href="#1-_INTRODUCTION" class="headerlink" title="1. INTRODUCTION"></a>1. INTRODUCTION</h2><p>Yelp does not provide keywords from its reviews. In a typical webpage of a store in Yelp, wordy reviews form a large part of the page. It might meet the expectation of the keen sharer that their opinion is presented at a eye-catching plot, however, those who only want to get the general impression of the store in a limited time will find this layout too time-consuming. And compared to Yelp.com, Amazon.com provides much better user experience. Therefore, in our project, we create a review refiner to find the keywords from yelp reviews. It offers the visitors with succinct description about this store, and saves time for those who has limited time to visit the website. We use different algorithms to generate keywords (TF-IDF and NLP), then the generated keywords can be presented on our website.</p>
+                <h2 id="1-_INTRODUCTION"><a href="#1-_INTRODUCTION" class="headerlink" title="1. INTRODUCTION"></a>1. INTRODUCTION</h2><p>Yelp does not provide keywords from its reviews. In a typical webpage of a store in Yelp, wordy reviews form a large part of the page. It might meet the expectation of the keen sharer that their opinion is presented at a eye-catching plot, however, those who only want to get the general impression of the store in a limited time will find this layout too time-consuming. And compared to Yelp.com, Amazon.com provides much better user experience. Therefore, in our project, we create a review refiner to find the keywords from yelp reviews. It offers the visitors with succinct description about this store, and saves time for those who has limited time to visit the website. We use different algorithms to generate keywords (TF-IDF and NLP), then the generated keywords can be presented on our website.</p>
 <h2 id="2-_PROBLEM_DEFINITION"><a href="#2-_PROBLEM_DEFINITION" class="headerlink" title="2. PROBLEM DEFINITION"></a>2. PROBLEM DEFINITION</h2><p>Yelp is a very useful tool for users to find shops they need. Users need to get the information from yelp reviews down below the shop website. However, yelp shops usually contain hundreds of reviews and sometimes the review could be very long. As a result, it takes a lot of time for users to get a brief impression on a yelp shop since so many long reviews need to be read. Therefore, we think the efficiency of yelp can be highly improved. In our project, we try to create a review refiner to generate keywords from yelp reviews to improve the efficiency of yelp.</p>
 <h2 id="3-_METHOD"><a href="#3-_METHOD" class="headerlink" title="3. METHOD"></a>3. METHOD</h2><p>Our project use Django to build the web framework, and choose python as programming language. For text mining, the TF-IDF algorithm and application of NLP are used to satisfy our main goal for extraction the keywords. Here’s our brief introduction of our method.</p>
 <h3 id="INTUITION"><a href="#INTUITION" class="headerlink" title="INTUITION"></a>INTUITION</h3><p>We choose TF-IDF algorithm to calculate and weight all candidates’ keywords we generated. The most popular method now is just using the TF (Term Frequency) to weight the keywords. Although this is a fast way to generate keywords, it may reduce the accuracy to some extent since when comparing with a set of documents, the words, which are popular in most of this data set, will also be chosen as keywords of certain documents. However, our usage of TF-IDF solves such problem since the algorithm checks all the dataset and returns the answers.</p>
