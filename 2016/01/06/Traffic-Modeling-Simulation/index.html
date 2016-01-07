@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    
+    <title>Traffic Modeling &amp; Simulation | Xiangyu Liu&#39;s Blog</title>
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    
+    <link rel="stylesheet" href="/libs/fancybox/jquery.fancybox.css" charset="utf-8">
+    
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="site">
+    <header class="site-header">
+        <h1 class="site-title"><a href="/">Xiangyu Liu&#39;s Blog</a></h1>
+        <nav class="site-nav">
+            <ul class="nav">
+                
+                <li><a href="/">Home</a></li>
+                
+                <li><a href="/archives">Archives</a></li>
+                
+                <li><a href="/atom.xml">rss</a></li>
+                
+                
+                <li><a class="toggle-search" href="#search">search</a></li>
+            </ul>
+        </nav>
+        <div class="site-search" id="search">
+            <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+        
+            <div class="site-header-background" style="background-image:url(http://reumia.github.io/hexo-theme-zzoman2015/images/background-zzoman2015.jpg)"></div>
+        
+    </header>
+    <div class="site-body">
+        <div class="global-width">
+    <article class="article" data-layout="post" data-slug="Traffic-Modeling-Simulation">
+        <div class="article-content">
+            
+<div class="article-gallery">
+  <div class="article-gallery-photos">
+    
+      <a class="article-gallery-img img-wrap" href="/img/traffic.PNG" rel="gallery_cij3ple0a0000nohtygr1ekw3" style="background-image:url(/img/traffic.PNG)"></a>
+    
+  </div>
+</div>
+
+            
+            <header class="article-header">
+                <div class="article-meta">
+                    
+                    
+                    
+                </div>
+                
+    <h1 class="article-title" itemprop="name">
+      <a href="/2016/01/06/Traffic-Modeling-Simulation/">Traffic Modeling &amp; Simulation</a>
+    </h1>
+
+            </header>
+            
+            <div class="article-body">
+                <p>Group menber: Eric Hein, Xiangyu Liu, Thea Knudsen</p>
+<h2 id="Problem_description"><a href="#Problem_description" class="headerlink" title="Problem description"></a>Problem description</h2><p>In this problem we investigate traffic on a section of road in Midtown, Atlanta, specifically the section of Peachtree St between 10th and 14th St. We are interested in predicting the average travel time in this section of road for two different scenarios: when the traffic lights at the intersections are unsynchronized, and when they are synchronized. The goal is to find a way to synchronize the traffic lights in a way that will decrease the average time it takes to travel through this section of road.<br>In order to predict the traffic, we use a discrete event simulation based on traffic data for the road section in question, collected for the NGSIM project by the Federal Highway Administration. The data was collected between 4:00 and 4:15 pm on November 8, 2006.<br>To solve this problem, we need a great amount of properties such as the signal timing pattern, the structure of lanes at different parts of Peachtree Street, the feature of vehicles and the drive habit for different drivers. To analyze these, here’s some more detailed information about our project.<br>We can use 5 Ws to start the description.<br>When: Our simulation model focuses on the afternoon commute time at which the original data was caught, between 4:00 p.m. and 4:15 p.m.<br>Where: The model takes place in 10th to 14th street and the data is generated from that point. We decide to use the map below from the google map which has something different compared with the data.<br>Who: The main component in the model is the vehicles on the road. This component may be affected by many aspects. We made some assumption to simplify some ignorable parameter.<br>What: it means what to do with the model. The input should be the distribution of vehicles based on the data. This simulation model focus on vehicles’ status.<br>Record of the travel time for every vehicle<br>How: there are two different cases we will consider separately, synchronized and unsynchronized traffic signals.<br>To sum, we plan to use the given data to draw a discrete event simulation to compute the travel time for each vehicles from different entrances to different exits at 4:00 p.m. to 4:15p.m. on the Peachtree Street from 10th to 14th street.<br>The traffic data and signal timing pattern come from project file and the lanes information for each intersection comes from google map.</p>
+<h2 id="Extracted_Data"><a href="#Extracted_Data" class="headerlink" title="Extracted Data"></a>Extracted Data</h2><p>Acceleration and maximum velocity on the road<br>Vehicle types (mainly length) and distance between stopped vehicles in the lanes<br>Driver’s reaction time and drive behavior (how to change the lane)<br>Left turn and U turn behavior (no left turn signal at 11th and 12th street)<br>Right turn when red signal<br>Start zone simulation (discrete model from data)<br>Vehicle event on the road (entering model, waiting for intersections, crossing intersections, exit model), get the input and output zone rate from data<br>Discrete model used to simulate the entrance and exit for every vehicle. Get the input and output zone rate from data<br>Unsynchronized. Use RYG time from signal data and design each signal independently<br>Synchronized. Use the same RYG time but create a strategy to improve the traffic flow</p>
+<h2 id="Desired_Output"><a href="#Desired_Output" class="headerlink" title="Desired Output"></a>Desired Output</h2><p>Record of the travel time for every vehicle<br>Recod of the travel time at main lanes (Northbound and Southbound on the Peachtree St.)</p>
+<h2 id="Street_Map"><a href="#Street_Map" class="headerlink" title="Street Map"></a>Street Map</h2><p>5 intersections (4 signal lights, 13th St doesn’t have one)<br>5 lanes (10th to 13th has 2 straight lanes and 1/2 left turn lane, 13th to 14th has 2 straight lanes southbound and 2 straight lanes and 1 left lane northbound)<br>11 entrances and exits<br><img src="/img/street.PNG" alt=" "></p>
+<h2 id="Conceptual_model"><a href="#Conceptual_model" class="headerlink" title="Conceptual model"></a>Conceptual model</h2><p>The road traffic is modeled as follows: A vehicle arrives at an entry zone according to a Poisson process. The arrival rate at each entry zone is different and is based on the NGSIM data. As a vehicle arrives, it will continue towards the next intersection. If the light at the intersection is red, the vehicle will get in the queue to cross the intersection and wait until the light turns green. If the light is green or yellow, there is no queue and no wait time. The next event is that the vehicle either crosses the intersection or exits the simulation domain. If it crosses the intersection, it will get in the queue for the next intersection.</p>
+<h2 id="Data_Extraction_and_Input_Analysis"><a href="#Data_Extraction_and_Input_Analysis" class="headerlink" title="Data Extraction and Input Analysis"></a>Data Extraction and Input Analysis</h2><h3 id="Arrival_rates"><a href="#Arrival_rates" class="headerlink" title="Arrival rates"></a>Arrival rates</h3><p>To find the distribution of the interarrival times for each input zone, all interarrival times for each zone were extracted from the NGSIM data set. For each input zone, the set of interarrival times were fitted to an exponential distribution. It is a common assumption to make that interarrival times are identical and independent exponentially distributed. The interarrival times for input zone 114, which contains the southbound lanes entering the intersection of Peachtree and 14th street, are shown in the histogram below.<br><img src="/img/interarrival.PNG" alt=" "><br>Observe that the data seems to be following an exponential distribution for the smaller inter- arrival times. However, there are some larger interarrival times that do not fit well in an exponential model. This is likely due to waves of traffic arriving from intersections north of 14th street. The same phenomena is seen in the interarrival times for the northbound lanes entering Peachtree/10th street. To check for independence, pairs of interarrival times (ti,ti+1) were plotted against each other. The scatter plot below shows that there is no significant correlation between subsequent arrival times.<br><img src="/img/arrivaltime.PNG" alt=" "><br>Despite the larger interarrival times in the data set, we choose to model interarrival times exponentially. The exponential distribution fitting was done using MATLAB’s fitdist function, which fits a data set to the given type of probability distribution using maximum likelihood estimators to estimate the parameters. In this case the parameter is the arrival rate, which is the inverse of the mean interarrival time.</p>
+<h3 id="Routing_Probabilities"><a href="#Routing_Probabilities" class="headerlink" title="Routing Probabilities"></a>Routing Probabilities</h3><p>In this simulation, a car will be randomly assigned to an exit zone when arriving at an input zone based on a probability model. These probabilities were extracted from the NGSIM data set by looking at all the different input zone-output zone pairs in the model, and counting how many cars followed that particular routing. Then, for each input zone, the fraction of cars exiting at a particular output zone was calculated, and this was used as the probability of getting assigned to that output zone in the simulation. </p>
+<h3 id="Traffic_Light_Timings"><a href="#Traffic_Light_Timings" class="headerlink" title="Traffic Light Timings"></a>Traffic Light Timings</h3><p>The timings for each traffic light were also provided by the NGSIM data set. We made some minor adjustments to the timings such that for each light, the red-green-yellow cycle added up to the same total time of 100 seconds. Within each intersection, the start of the cycle for each individual light was adjusted so that together they mimic a real intersection, e.g., north- and southbound lanes have a red light while east- and westbound lanes have a green light. </p>
+<h3 id="Random_Number_Generator"><a href="#Random_Number_Generator" class="headerlink" title="Random Number Generator"></a>Random Number Generator</h3><p>For generating random numbers for interarrival times, routing probabilities and signal initialization, we used the rand() function in the C++ std library, which is a thoroughly tested linear congruential generator. For the interarrival times, the random number generated was used to find a uniform(0,1) number u. Then, using the inverse transform theorem, interarrival times X were sampled as x = F’(u), where F(x) = 1-e^(-rx)<br>is the cumulative distribution function (CDF) for an exponential distribution with arrival rate r.</p>
+<h3 id="Assumptions"><a href="#Assumptions" class="headerlink" title="Assumptions"></a>Assumptions</h3><p>When constructing a conceptual model the data set used for this simulation is quite extensive, so a more detailed model could certainly be developed, but because time constraints we are making the following assumptions:<br>Reaction time: We assume that each vehicle in line has a constant reaction time (delay) from the time a vehicle is allowed to move and until it actually starts moving. The average drive delay we extracted from the data is 1.9 sec.<br>Acceleration: Since the acceleration time for vehicles from start to average velocity is very short, we exclude acceleration in cars from standstill, assuming that all vehicles will start and stop directly.<br>Velocity: From the data it tells that the velocity distribution for a certain time has a dominant intersection. So we assume that all vehicles share the same velocity in the model.<br>Exit zones: Assume there is always room to exit the simulation in a zone because for a general situation lanes can hardly be full.<br>Determination of input and output zones: Vehicles arrive input zones based on the distribution from the data, and determind the output zones after they arrive. And the proper lanes will be decided from input zones to output zones.<br>Drivers behavior: We assume that all driver will choose the lane with shortest queue unless he is turning on the next light (with a “buffer”; will not change lane if the queue in the other lane is only a little bit shorter).<br>Choose turning lane: We assume that the car gets into the turning lane in the section just before the turn.<br>Driver types: We also assume that all drivers follow the same driving pattern based on where their end zone is, in other words, no different driver types.<br>Other general assumptions: No bad weather, No traffic accident, No crossing people, etc.</p>
+<h3 id="Simplifications"><a href="#Simplifications" class="headerlink" title="Simplifications"></a>Simplifications</h3><p>To make the simulation program easier to implement, we make some simplifications to the model.<br>Vehicle size: We assume that all vehicles are the same size. To account for larger vehicles (trucks) taking up more space on the road, the arrival rate can be adjusted accordingly. This simplifies the implementation of the simulation model significantly.<br>Stop Distance: We assume the distance between stopped vehicles is constant since it can be added to verify how many vehicles can a lane contain.<br>Intersection: Each lanes is designed to have its own crossing event schedule (in other words, it has an intersection zone for itself), so that we simplify our model that vehicles cross the intersection one at a time.<br>Lane changing: Since we assume vehicles will choose turning lane in the intsection, we make a simplification that vehicles won’t change lanes in the sections.<br>Filtering zones: based on the data, there are some input and output zones that have a very low rate for vehicles entering and exiting (the Google Map shows that these zones represent parking lots). We filter these zones because it hardly affects the distribution and hurts the simulation.</p>
+<h2 id="Code_description"><a href="#Code_description" class="headerlink" title="Code description"></a>Code description</h2><h3 id="Simulation_Executive"><a href="#Simulation_Executive" class="headerlink" title="Simulation Executive"></a>Simulation Executive</h3><p>There are several ways to implement a discrete event simulation. We have chosen to use an event oriented world view, which means that simulation program is built with a focus on a series of events happening rather than following entities through the simulation process. The simulator was written in C++. No outside software packages were used, besides several container classes from the C++ Standard Template Library (STL). The simulation executive uses a priority queue to keep events sorted by timestamp. The future event list (FEL) is implemented as an STL priority_queue. The main loop executes one event from the queue at a time, halting only when it reaches a special stop event.</p>
+<h3 id="Software_Architecture"><a href="#Software_Architecture" class="headerlink" title="Software Architecture"></a>Software Architecture</h3><p>Detailed documentation of the simulation code has been generated using doxygen. The documentation is located in the attached source distribution in the folder doc/html. Open the file hierarchy.html in a web browser to view.<br>The application code is heavily object oriented to separate the behavior of each entity into its own class. The majority of the classes fall into two categories, State and Events. All Events inherit from the event class, so that the executive can use polymorphism store them in the priority queue and call the process() method on each one. The other folder contains classes that represent the state of the system, such as the color of each traffic light, the line of cars waiting at an intersection, or the destination zone of a vehicle.<br>State classes typically have an event in the queue at all times to control the next update of the entity. For example, the traffic light constructor schedules the first color change event. When this event is processed, it changes the color of the light and schedules the next color change based on the traffic light timing parameters. Similarly, every arrival of a vehicle at an input zone schedules the next arrival at that zone based on a probability distribution. Each lane schedules intersection crossing events for its own cars, taking into account the color and timing of the traffic light to decide when the next crossing will occur. If no vehicles are in a lane, the next crossing event will be scheduled as soon as a car enters the lane.</p>
+<h3 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h3><p>For testing, we simulated a single traffic stop on a one-way road. Cars enter at a constant rate from the south, cross an intersection governed by a traffic signal, and continue to the north. Once this was working, we gradually added more features, testing as we went. An important part of simulator verification was the liberal use of logging functions to print the timestamp and an informational message whenever an event executed. With these messages in place, we could watch as the simulation progressed and gain insight into the correct operation of the simulator.</p>
+<h3 id="Initialization"><a href="#Initialization" class="headerlink" title="Initialization"></a>Initialization</h3><p>In order to recreate the Peachtree network in our simulator, many lanes, traffic lights, and input/output zones need to be created. The Intersection class provides several helpful methods for doing this in an orderly manner. The main function initializes the network in the following manner. First, an intersection is created. Then, lanes are attached to the intersection in each direction. Traffic lights are associated with each lane during this step. Each lane has two traffic lights, one for left turns, and another for going straight or making a right turn. To emulate a left-turn only lane, a “dummy” light that is always red is inserted in place of the straight light. Placing a dummy light in the left turn light produces a lane that can only go straight or turn right. Finally, lanes are connected between intersections.  This step determines which directions vehicles can go from each lane. Before the simulation begins, each lane traverses all possible paths to discover which output zones are reachable from itself. This routing table is stored and used by vehicles as they traverse the system to decide when to lane change into a turning lane.</p>
+<h3 id="Output"><a href="#Output" class="headerlink" title="Output"></a>Output</h3><p>For each vehicle that reaches an output zone, the simulator outputs the source zone, destination zone, and the time the vehicle spent in the simulation. For debugging purposes, the simulator This can be used to calculate the average time a car uses to pass through the domain, which is what we wish to predict for both the unsynchronized and the synchronized case.</p>
+<h2 id="Simulation_results_and_output_analysis"><a href="#Simulation_results_and_output_analysis" class="headerlink" title="Simulation results and output analysis"></a>Simulation results and output analysis</h2><p>The purpose of this simulation was to compare traffic flow on a simulated portion of road when using unsynchronised versus synchronised traffic light timings. Each intersection had a traffic light cycle of 100 seconds. For the unsynchronized simulation runs, each intersection started the traffic light cycle at a random time in the cycle, independent of the other intersections. Let t(cyc) describe where in the cycle a traffic light is at the beginning of the simulation. In the synchronized runs, the traffic lights at the intersection of Peachtree and 14th street started at the beginning of the timings cycle, t(cyc)=0. When traveling south, each intersection had a delay in  t(cyc) of x seconds compared to the previous intersections, for x = {0, 5, 10, 15, 20}. Then, for each synchronization, we looked at the difference between the average simulated travel time per car for the unsynchronized and the synchronized runs. Each instance was run 30 times, and the average over these 30 runs was used for the comparisons of instances. </p>
+<h3 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h3><p>We looked the travel times both for all cars in the simulation, and for only those that traveled through the entire simulation domain, i.e. from 10th to 14th street or from 14th to 10th street.<br>Plots of the average travel times are shown below:<br><img src="/img/allcar.PNG" alt=" "><br><img src="/img/partcar.PNG" alt=" "><br>For all cars (top), it looks like delays of 0, 5 and 10 seconds all give shorter travel times. For the north/south traveling cars we also see an improvement for a 15 second delay. This was confirmed with 95% confidence when performing a paired t-test on the average difference d between the average travel times for the unsynchronised and synchronised systems.</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>After careful modeling, input analysis, and software design, we successfully simulated traffic flow through several intersections on Peactree Street. The results gathered from this simulation show that traffic light synchronization is almost always better than unsynchronized operation. Specifially, an offset of 5 seconds between adjacent lights dramatically improved travel time for cars traveling north and south on Peachtree Street. </p>
+<hr>
+
+            </div>
+        </div>
+    </article>
+
+    
+    
+<nav class="article-nav">
+  
+  
+    <a href="/2016/01/06/Yelp-Refiner/" id="article-nav-older" class="article-nav-link-wrap next">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Yelp Refiner</div>
+    </a>
+  
+</nav>
+
+    
+
+    
+</div>
+    </div>
+    <footer class="site-footer">
+        <div class="global-width">
+            <ul class="site-widget">
+                
+                <li class="widget widget-links">
+                    <div class="linkslist">
+  <p class="asidetitle">links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://www.facebook.com/profile.php?id=100007028386722" target="_blank" title="Facebook">Facebook</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="https://www.linkedin.com/in/xiangyu-liu-04707598" target="_blank" title="LinkedIn">LinkedIn</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="https://github.com/lxy16555" target="_blank" title="Github">Github</a>
+            
+          </li>
+        
+    </ul>
+</div>
+                </li>
+                
+                <li class="widget widget-tag">
+                    
+                </li>
+                
+                <li class="widget widget-category">
+                    
+                </li>
+                
+                <li class="widget widget-recent_posts">
+                    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-body">
+      <ul>
+        
+          <li>
+            <a href="/2016/01/06/Traffic-Modeling-Simulation/">Traffic Modeling &amp; Simulation</a>
+          </li>
+        
+          <li>
+            <a href="/2016/01/06/Yelp-Refiner/">Yelp Refiner</a>
+          </li>
+        
+          <li>
+            <a href="/2016/01/06/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+                </li>
+                
+            </ul>
+        </div>
+        <div class="site-info">
+            <address>
+                &copy; 2015 <a href="http://yoursite.com">Xiangyu Liu&#39;s Blog</a> All Right Reserved. <br/>
+                Powered by <a href="http://hexo.io">Hexo</a>. Theme by <a href="http://hexo.io/themes/">Hexo Themes</a>
+            </address>
+        </div>
+    </footer>
+    
+    <script src="/libs/jquery-1.11.3.min.js" type="text/javascript"></script>
+    
+    <script src="/libs/fancybox/jquery.fancybox.js" type="text/javascript"></script>
+    
+    <script src="/js/site_init.js" type="text/javascript"></script>
+    
+</body>
+</html>
